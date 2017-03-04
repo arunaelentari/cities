@@ -72,7 +72,7 @@ var (
 		city{name: "New York", population: 8.406e6, cost: ExpensiveCost, climate: GoodClimate},
 		city{name: "Copenhagen", population: 562379, cost: ExpensiveCost, climate: PoorClimate},
 		city{name: "Stockholm", population: 789024, cost: ExpensiveCost, climate: PoorClimate},
-		city{name: "Deviltown", population: 1234567890, cost: VeryExpensiveCost, climate: NastyClimate},
+		city{name: "Deviltown", population: 1233567890, cost: VeryExpensiveCost, climate: NastyClimate},
 		city{name: "Paradisio", population: 1e6, cost: CheapCost, climate: PerfectClimate},
 	}
 )
