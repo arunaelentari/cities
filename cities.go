@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"net/http"
 )
 
 type (
@@ -146,9 +147,8 @@ func (cs cities) sortBy(criteria string) {
 
 }
 
-func main() {
-	fmt.Println("Dobroe utro, Larsik!! Where shall we live?")
-	fmt.Printf("We have %v cities: %v\n", len(Cities), Cities.getNames())
+func getCityInfo() string{
+	s := ""
 	// We want a way to sort by a weighted set of criteria, e.g:
 	// Cities.sortByCriteria(criteria{"climate", 2}, criteria{"cost", 1})
 	// Or:
@@ -165,20 +165,34 @@ func main() {
 	// * Barcelona: 1.6M, cost: reasonable, climate: great
   	// * Paradisio: 1.0M, cost: cheap, climate: perfect
 
-	fmt.Println("The sorted cities by name are:")
+	s += "The sorted cities by name are:\n"
 	Cities.sortBy("name")
-	fmt.Println(Cities)
+	s += Cities.String()
+	return s
 
-	fmt.Println("The sorted cities by population are:")
-	Cities.sortBy("population")
-	fmt.Println(Cities)
+	//fmt.Println("The sorted cities by population are:")
+//	Cities.sortBy("population")
+//	fmt.Println(Cities)
 
-	fmt.Println("The sorted cities by cost are:")
-	Cities.sortBy("cost")
-	fmt.Println(Cities)
+//	fmt.Println("The sorted cities by cost are:")
+//	Cities.sortBy("cost")
+//	fmt.Println(Cities)
 
-	fmt.Println("The sorted cities by climate are:")
-	Cities.sortBy("climate")
-	fmt.Println(Cities)
+//	fmt.Println("The sorted cities by climate are:")
+//	Cities.sortBy("climate")
+//	fmt.Println(Cities)
+}
 
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("You are all my minions, beware %v !\n", r.RemoteAddr)     
+  	fmt.Fprintf(w, getCityInfo())
+}
+
+func main() {
+	fmt.Println("Dobroe utro, Larsik!! Where shall we live?")
+	fmt.Printf("We have %v cities: %v\n", len(Cities), Cities.getNames())
+	fmt.Printf("I will now be a webe server forever, you puny minions, hahahaha!\n")
+	http.HandleFunc("/", indexHandler)
+	err := http.ListenAndServe(":443", nil)
+	panic(err)
 }
