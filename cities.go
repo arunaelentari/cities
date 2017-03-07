@@ -147,8 +147,8 @@ func (cs cities) sortBy(criteria string) {
 
 }
 
-// getCityInfo returns information on cities.
-func getCityInfo() string{
+// getInfo returns information on cities.
+func (cs cities) getInfo() string{
 	// We want a way to sort by a weighted set of criteria, e.g:
 	// Cities.sortByCriteria(criteria{"climate", 2}, criteria{"cost", 1})
 	// Or:
@@ -164,27 +164,26 @@ func getCityInfo() string{
 	// * New York: 8.4M, cost: expensive, climate: good
 	// * Barcelona: 1.6M, cost: reasonable, climate: great
   	// * Paradisio: 1.0M, cost: cheap, climate: perfect
+
 	n := "The sorted cities by name are:\n"
-	Cities.sortBy("name")
-	n += Cities.String()
-
+	cs.sortBy("name")
+	n += cs.String()
 	n += "\nThe sorted cities by population are:\n"
-	Cities.sortBy("population")
-	n += Cities.String()
+	cs.sortBy("population")
+	n += cs.String()
+	n += "\nThe sorted cities by cost are:\n"
+	cs.sortBy("cost")
+	n += cs.String()
+	n += "\nThe sorted cities by climate are:\n"
+	cs.sortBy("climate")
+	n += cs.String()
 	return n
-
-//	fmt.Println("The sorted cities by cost are:")
-//	Cities.sortBy("cost")
-//	fmt.Println(Cities)
-
-//	fmt.Println("The sorted cities by climate are:")
-//	Cities.sortBy("climate")
-//	fmt.Println(Cities)
 }
+
 // indexHandler writes the http reply to the request for the index page.
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("You are all my minions, beware %v !\n", r.RemoteAddr)
-  	fmt.Fprintf(w, getCityInfo())
+  	fmt.Fprintf(w, Cities.getInfo())
 }
 
 func main() {
