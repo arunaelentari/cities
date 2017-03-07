@@ -182,9 +182,9 @@ func getCityInfo() string{
 //	Cities.sortBy("climate")
 //	fmt.Println(Cities)
 }
-
+// indexHandler writes the http reply to the request for the index page
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("You are all my minions, beware %v !\n", r.RemoteAddr)     
+	fmt.Printf("You are all my minions, beware %v !\n", r.RemoteAddr)
   	fmt.Fprintf(w, getCityInfo())
 }
 
