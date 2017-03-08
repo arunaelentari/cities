@@ -9,6 +9,9 @@ import (
 	"sort"
 	"strings"
 	"net/http"
+	"crypto/tls"
+
+	"golang.org/x/crypto/acme/autocert"
 )
 
 type (
@@ -187,10 +190,21 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	// TODO: we need to undestand how the private key and certificate is cached.
+	// https://godoc.org/golang.org/x/crypto/acme/autocert#Manager.
+	m := autocert.Manager{
+		Prompt: autocert.AcceptTOS,
+		HostPolicy: autocert.HostWhitelist("cities.hkjn.me"),
+	}
+	s := &http.Server{
+		Addr: ":https",
+		TLSConfig: &tls.Config{GetCertificate: m.GetCertificate},
+	}
+
 	fmt.Println("Dobroe utro, Larsik!! Where shall we live?")
 	fmt.Printf("We have %v cities: %v\n", len(Cities), Cities.getNames())
 	fmt.Printf("I will now be a webe server forever, you puny minions, hahahaha!\n")
 	http.HandleFunc("/", indexHandler)
-	err := http.ListenAndServe(":443", nil)
+	err := s.ListenAndServeTLS("", "")
 	panic(err)
 }
