@@ -6,6 +6,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"sort"
 	"strings"
 	"net/http"
@@ -185,7 +186,7 @@ func (cs cities) getInfo() string{
 
 // indexHandler writes the http reply to the request for the index page.
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("You are all my minions, beware %v !\n", r.RemoteAddr)
+	log.Printf("You are all my minions, beware %v !\n", r.RemoteAddr)
   	fmt.Fprintf(w, Cities.getInfo())
 }
 
@@ -201,10 +202,11 @@ func main() {
 		TLSConfig: &tls.Config{GetCertificate: m.GetCertificate},
 	}
 
-	fmt.Println("Dobroe utro, Larsik!! Where shall we live?")
-	fmt.Printf("We have %v cities: %v\n", len(Cities), Cities.getNames())
-	fmt.Printf("I will now be a webe server forever, you puny minions, hahahaha!\n")
+	log.Println("Dobroe utro, Larsik!! Where shall we live?")
+	log.Printf("We have %v cities: %v\n", len(Cities), Cities.getNames())
+	log.Printf("I will now be a webe server forever, you puny minions, hahahaha!\n")
 	http.HandleFunc("/", indexHandler)
 	err := s.ListenAndServeTLS("", "")
 	panic(err)
 }
+
