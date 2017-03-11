@@ -55,6 +55,23 @@ const (
 	PerfectClimate
 )
 
+// TODO: this needs to dynamically include lists of cities like before.
+const HtmlTemplate = `
+<html>
+  <body>
+    <h1>Welcome!</h1>
+    <h2>Are you in search of your dream city?</h2>
+    <p>The sorted cities by cost are:
+      <ol>
+        <li> Paradision: 1.0M, cost: cheap, climate: perfect</li>
+        <li> Deviltown: 3.0M, cost: outrageous, climate: horrendous</li>
+      </ol>
+    </p>
+  </body>
+</html>
+`
+
+
 var (
 	ClimateDesc = map[climate]string{
 		NastyClimate:   "nasty",
@@ -187,7 +204,8 @@ func (cs cities) getInfo() string{
 // indexHandler writes the http reply to the request for the index page.
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("You are all my minions, beware %v !\n", r.RemoteAddr)
-  	fmt.Fprintf(w, Cities.getInfo())
+	fmt.Fprintf(w, HtmlTemplate)
+	// fmt.Fprintf(w, Cities.getInfo())
 }
 
 func main() {
