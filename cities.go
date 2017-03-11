@@ -191,10 +191,9 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	// TODO: we need to undestand how the private key and certificate is cached.
-	// https://godoc.org/golang.org/x/crypto/acme/autocert#Manager.
 	m := autocert.Manager{
 		Prompt: autocert.AcceptTOS,
+		Cache: autocert.DirCache("cache"),
 		HostPolicy: autocert.HostWhitelist("cities.hkjn.me"),
 	}
 	s := &http.Server{
