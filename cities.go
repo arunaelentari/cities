@@ -11,6 +11,7 @@ import (
 	"strings"
 	"net/http"
 	"crypto/tls"
+	"html/template"
 
 	"golang.org/x/crypto/acme/autocert"
 )
@@ -55,22 +56,23 @@ const (
 	PerfectClimate
 )
 
-// TODO: this needs to dynamically include lists of cities like before.
 const HtmlTemplate = `
+<!DOCTYPE html>
 <html>
-  <body>
-    <h1>Welcome!</h1>
-    <h2>Are you in search of your dream city?</h2>
-    <p>The sorted cities by cost are:
-      <ol>
-        <li> Paradision: 1.0M, cost: cheap, climate: perfect</li>
-        <li> Deviltown: 3.0M, cost: outrageous, climate: horrendous</li>
-      </ol>
-    </p>
-  </body>
-</html>
-`
-
+	<head>
+		<meta charset="UTF-8">
+		<title>{{.Title}}</title>
+	</head>
+	<body>
+		<h1>{{.Title}}</h1>
+		<h2>Are you in search of your dream city?</h2>
+		<p>The sorted cities by cost are:
+			<ol>
+				{{range .Cities}}<li>{{ . }}</li>{{end}}
+			</ol>
+		</p>
+	</body>
+</html>`
 
 var (
 	ClimateDesc = map[climate]string{
@@ -204,7 +206,25 @@ func (cs cities) getInfo() string{
 // indexHandler writes the http reply to the request for the index page.
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("You are all my minions, beware %v !\n", r.RemoteAddr)
-	fmt.Fprintf(w, HtmlTemplate)
+
+	t, err := template.New("webpage").Parse(HtmlTemplate)
+	if err != nil {
+		panic(err)
+	}
+	Cities.sortBy("cost")
+	data := struct {
+		Title string
+		Cities cities
+	}{
+		Title: "Welcome",
+		Cities: Cities,
+	}
+
+	err = t.Execute(w, data)
+	if err != nil {
+		panic(err)
+	}
+	// fmt.Fprintf(w, HtmlTemplate)
 	// fmt.Fprintf(w, Cities.getInfo())
 }
 
