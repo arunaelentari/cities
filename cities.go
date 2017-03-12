@@ -38,6 +38,10 @@ type (
 		name   string      // e.g. "population"
 		value  interface{} // this is an int or a cost or a climate
 	}
+	pageData  struct {
+		Title string
+		Cities cities
+	}
 )
 
 const (
@@ -209,13 +213,10 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 	t, err := template.New("webpage").Parse(HtmlTemplate)
 	if err != nil {
-		panic(err)
+		log.Panicf("Help, I couldn't parse the %v\n", err)
 	}
 	Cities.sortBy("cost")
-	data := struct {
-		Title string
-		Cities cities
-	}{
+	data := pageData {
 		Title: "Welcome",
 		Cities: Cities,
 	}
@@ -224,8 +225,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	// fmt.Fprintf(w, HtmlTemplate)
-	// fmt.Fprintf(w, Cities.getInfo())
 }
 
 func main() {
