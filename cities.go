@@ -215,6 +215,12 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "This is a bad request. Try again!", http.StatusBadRequest)
 		return
 	}
+        if r.URL.Path != "/" {
+                log.Printf("This ain't right: %v!\n", r.URL.Path)
+                http.Error(w, "There ain't no page, dude.", http.StatusNotFound)
+                return
+        }
+
 	t, err := template.New("webpage").Parse(HtmlTemplate)
 	if err != nil {
 		log.Panicf("Help, I couldn't parse the %v\n", err)
