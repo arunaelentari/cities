@@ -210,6 +210,11 @@ func (cs cities) getInfo() string{
 // indexHandler writes the http reply to the request for the index page.
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("You are all my minions, %v, beware  %v, %v!\n", r.RemoteAddr, r.Method, r.URL)
+	if r.Method != "GET" {
+		log.Printf("This ain't right: %v!\n", r.Method)
+		http.Error(w, "This is a bad request. Try again!", http.StatusBadRequest)
+		return
+	}
 	t, err := template.New("webpage").Parse(HtmlTemplate)
 	if err != nil {
 		log.Panicf("Help, I couldn't parse the %v\n", err)
