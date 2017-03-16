@@ -217,7 +217,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
         if r.URL.Path != "/" {
                 log.Printf("This ain't right: %v!\n", r.URL.Path)
-                http.Error(w, "There ain't no page, dude.", http.StatusNotFound)
+                http.Error(w, "There ain't no page, man.", http.StatusNotFound)
                 return
         }
 
