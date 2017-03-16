@@ -60,7 +60,8 @@ const (
 	PerfectClimate
 )
 
-const HtmlTemplate = `
+const (
+	HtmlTemplate = `
 <!DOCTYPE html>
 <html>
 	<head>
@@ -77,6 +78,21 @@ const HtmlTemplate = `
 		</p>
 	</body>
 </html>`
+	PageNotFound = `
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Cities</title>
+	</head>
+	<body>
+		<h1>404</h1>
+		<h2>There ain't no page here. Try again!</h2>
+		<p><a href="/">Wanna check out our cities?</a></p>
+	</body>
+</html>`
+
+)
 
 var (
 	ClimateDesc = map[climate]string{
@@ -217,7 +233,8 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
         if r.URL.Path != "/" {
                 log.Printf("This ain't right: %v!\n", r.URL.Path)
-                http.Error(w, "There ain't no page, man.", http.StatusNotFound)
+                fmt.Fprintf(w, PageNotFound)
+		w.WriteHeader(http.StatusNotFound)
                 return
         }
 
