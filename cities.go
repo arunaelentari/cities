@@ -1,17 +1,25 @@
-// This program ranks cities based on a number of criteria.
+// This program is a website that helps you choose a dream city based on various rankings.
 //
-// Criteria have a positive weight. This allows us to compare two cities and say which one is greater.
+// The home page includes a list of cities.
+//
+// A user can sort cities based on cost, climate, population and other criteria.
+//
+// These are shown on separate pages.
+// - GET /: the index page, gives links to the other pages.
+// - GET /by-cost: ranks cities by cost.
+// - GET /by-climate: ranks cities by climate.
+// - GET /by-population: ranks cities by population.
 
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
+	"html/template"
 	"log"
+	"net/http"
 	"sort"
 	"strings"
-	"net/http"
-	"crypto/tls"
-	"html/template"
 
 	"golang.org/x/crypto/acme/autocert"
 )
@@ -38,9 +46,10 @@ type (
 		name   string      // e.g. "population"
 		value  interface{} // this is an int or a cost or a climate
 	}
-	pageData  struct {
-		Title string
-		Cities cities
+	pageData struct {
+		Title    string
+		Criteria string
+		Cities   cities
 	}
 )
 
@@ -61,7 +70,7 @@ const (
 )
 
 const (
-	HtmlTemplate = `
+	IndexTemplate = `
 <!DOCTYPE html>
 <html>
 	<head>
@@ -71,7 +80,26 @@ const (
 	<body>
 		<h1>{{.Title}}</h1>
 		<h2>Are you in search of your dream city?</h2>
-		<p>The sorted cities by cost are:
+		<p>Check out these links:
+			<ul>
+				<li><a href="/by-cost">by cost</a></li>
+				<li><a href="/by-climate">by climate</a></li>
+				<li><a href="/by-population">by population</a></li>
+			</ul>
+		</p>
+	</body>
+</html>`
+	CitiesTemplate = `
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>{{.Title}}</title>
+	</head>
+	<body>
+		<h1>{{.Title}}</h1>
+		<h2>Are you in search of your dream city?</h2>
+		<p>The sorted cities by {{.Criteria}} are:
 			<ol>
 				{{range .Cities}}<li>{{ . }}</li>{{end}}
 			</ol>
@@ -88,10 +116,9 @@ const (
 	<body>
 		<h1>404</h1>
 		<h2>There ain't no page here. Try again!</h2>
-		<p><a href="/">Wanna check out our cities?</a></p>
+		<p><a href="/">Wanna find an affordable city?</a></p>
 	</body>
 </html>`
-
 )
 
 var (
@@ -191,7 +218,7 @@ func (cs cities) sortBy(criteria string) {
 }
 
 // getInfo returns information on cities.
-func (cs cities) getInfo() string{
+func (cs cities) getInfo() string {
 	// We want a way to sort by a weighted set of criteria, e.g:
 	// Cities.sortByCriteria(criteria{"climate", 2}, criteria{"cost", 1})
 	// Or:
@@ -202,11 +229,11 @@ func (cs cities) getInfo() string{
 	//
 	// The sorted cities by climate (67%) and cost (33%) are:
 	// * Deviltown: 1234.6M, cost: very expensive, climate: nasty
-  	// * Copenhagen: 562 379, cost: expensive, climate: poor
-  	// * Stockholm: 789 024, cost: expensive, climate: poor
+	// * Copenhagen: 562 379, cost: expensive, climate: poor
+	// * Stockholm: 789 024, cost: expensive, climate: poor
 	// * New York: 8.4M, cost: expensive, climate: good
 	// * Barcelona: 1.6M, cost: reasonable, climate: great
-  	// * Paradisio: 1.0M, cost: cheap, climate: perfect
+	// * Paradisio: 1.0M, cost: cheap, climate: perfect
 
 	n := "The sorted cities by name are:\n"
 	cs.sortBy("name")
@@ -231,21 +258,54 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "This is a bad request. Try again!", http.StatusBadRequest)
 		return
 	}
-        if r.URL.Path != "/" {
-                log.Printf("This ain't right: %v!\n", r.URL.Path)
+	if r.URL.Path != "/" {
+		log.Printf("This ain't right: %v!\n", r.URL.Path)
 		w.WriteHeader(http.StatusNotFound)
-                fmt.Fprintf(w, PageNotFoundHtml)
-                return
-        }
+		fmt.Fprintf(w, PageNotFoundHtml)
+		return
+	}
 
-	t, err := template.New("webpage").Parse(HtmlTemplate)
+	t, err := template.New("webpage").Parse(IndexTemplate)
 	if err != nil {
 		log.Panicf("Help, I couldn't parse the %v\n", err)
 	}
 	Cities.sortBy("cost")
-	data := pageData {
-		Title: "Welcome",
+	data := pageData{
+		Title:  "Welcome",
 		Cities: Cities,
+	}
+
+	err = t.Execute(w, data)
+	if err != nil {
+		panic(err)
+	}
+}
+
+// TODO: create by-climate and by-population handlers, add links back to index page, change html
+// byCostHandler writes the http reply to the request for the by cost page.
+func byCostHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("You are all my minions, %v, beware  %v, %v!\n", r.RemoteAddr, r.Method, r.URL)
+	if r.Method != "GET" {
+		log.Printf("This ain't right: %v!\n", r.Method)
+		http.Error(w, "This is a bad request. Try again!", http.StatusBadRequest)
+		return
+	}
+	if r.URL.Path != "/by-cost" {
+		log.Printf("This ain't right: %v!\n", r.URL.Path)
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintf(w, PageNotFoundHtml)
+		return
+	}
+
+	t, err := template.New("webpage").Parse(CitiesTemplate)
+	if err != nil {
+		log.Panicf("Help, I couldn't parse the %v\n", err)
+	}
+	Cities.sortBy("cost")
+	data := pageData{
+		Title:    "By cost",
+		Criteria: "cost",
+		Cities:   Cities,
 	}
 
 	err = t.Execute(w, data)
@@ -256,12 +316,12 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	m := autocert.Manager{
-		Prompt: autocert.AcceptTOS,
-		Cache: autocert.DirCache("cache"),
+		Prompt:     autocert.AcceptTOS,
+		Cache:      autocert.DirCache("cache"),
 		HostPolicy: autocert.HostWhitelist("cities.hkjn.me"),
 	}
 	s := &http.Server{
-		Addr: ":https",
+		Addr:      ":https",
 		TLSConfig: &tls.Config{GetCertificate: m.GetCertificate},
 	}
 
@@ -269,7 +329,7 @@ func main() {
 	log.Printf("We have %v cities: %v\n", len(Cities), Cities.getNames())
 	log.Printf("I will now be a webe server forever, you puny minions, hahahaha!\n")
 	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/by-cost", byCostHandler)
 	err := s.ListenAndServeTLS("", "")
 	panic(err)
 }
-
