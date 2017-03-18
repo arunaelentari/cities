@@ -78,7 +78,7 @@ const (
 		</p>
 	</body>
 </html>`
-	PageNotFound = `
+	PageNotFoundHtml = `
 <!DOCTYPE html>
 <html>
 	<head>
@@ -233,8 +233,8 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
         if r.URL.Path != "/" {
                 log.Printf("This ain't right: %v!\n", r.URL.Path)
-                fmt.Fprintf(w, PageNotFound)
 		w.WriteHeader(http.StatusNotFound)
+                fmt.Fprintf(w, PageNotFoundHtml)
                 return
         }
 
