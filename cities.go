@@ -104,6 +104,7 @@ const (
 				{{range .Cities}}<li>{{ . }}</li>{{end}}
 			</ol>
 		</p>
+		<p>Go back to: <a href="/">home</a></p>
 	</body>
 </html>`
 	PageNotFoundHtml = `
