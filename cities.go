@@ -282,35 +282,38 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // TODO: create by-climate and by-population handlers, add links back to index page, change html
-// byCostHandler writes the http reply to the request for the by cost page.
-func byCostHandler(w http.ResponseWriter, r *http.Request) {
-	log.Printf("You are all my minions, %v, beware  %v, %v!\n", r.RemoteAddr, r.Method, r.URL)
-	if r.Method != "GET" {
-		log.Printf("This ain't right: %v!\n", r.Method)
-		http.Error(w, "This is a bad request. Try again!", http.StatusBadRequest)
-		return
-	}
-	if r.URL.Path != "/by-cost" {
-		log.Printf("This ain't right: %v!\n", r.URL.Path)
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprintf(w, PageNotFoundHtml)
-		return
-	}
+func getCriteriaHandler(c string) func(http.ResponseWriter, *http.Request) {
+	log.Printf("Yo, I am supposed to get back the handler to criterion %s, maan\n", c)
 
-	t, err := template.New("webpage").Parse(CitiesTemplate)
-	if err != nil {
-		log.Panicf("Help, I couldn't parse the %v\n", err)
-	}
-	Cities.sortBy("cost")
-	data := pageData{
-		Title:    "By cost",
-		Criteria: "cost",
-		Cities:   Cities,
-	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("You are all my minions, %v, beware  %v, %v!\n", r.RemoteAddr, r.Method, r.URL)
+		if r.Method != "GET" {
+			log.Printf("This ain't right: %v!\n", r.Method)
+			http.Error(w, "This is a bad request. Try again!", http.StatusBadRequest)
+			return
+		}
+		if r.URL.Path != fmt.Sprintf("/by-%s", c) {
+			log.Printf("This ain't right: %v!\n", r.URL.Path)
+			w.WriteHeader(http.StatusNotFound)
+			fmt.Fprintf(w, PageNotFoundHtml)
+			return
+		}
 
-	err = t.Execute(w, data)
-	if err != nil {
-		panic(err)
+		t, err := template.New("webpage").Parse(CitiesTemplate)
+		if err != nil {
+			log.Panicf("Help, I couldn't parse the %v\n", err)
+		}
+		Cities.sortBy(c)
+		data := pageData{
+			Title:    fmt.Sprintf("By %s", c),
+			Criteria: c,
+			Cities:   Cities,
+		}
+
+		err = t.Execute(w, data)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
@@ -327,9 +330,11 @@ func main() {
 
 	log.Println("Dobroe utro, Larsik!! Where shall we live?")
 	log.Printf("We have %v cities: %v\n", len(Cities), Cities.getNames())
-	log.Printf("I will now be a webe server forever, you puny minions, hahahaha!\n")
+	log.Println("I will now be a webe server forever, you puny minions, hahahaha!")
 	http.HandleFunc("/", indexHandler)
-	http.HandleFunc("/by-cost", byCostHandler)
+	http.HandleFunc("/by-cost", getCriteriaHandler("cost"))
+	http.HandleFunc("/by-population", getCriteriaHandler("population"))
+	http.HandleFunc("/by-climate", getCriteriaHandler("climate"))
 	err := s.ListenAndServeTLS("", "")
 	panic(err)
 }
