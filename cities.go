@@ -9,6 +9,7 @@
 // - GET /by-cost: ranks cities by cost.
 // - GET /by-climate: ranks cities by climate.
 // - GET /by-population: ranks cities by population.
+// - POST /city: allows users to enter a city
 
 package main
 
@@ -16,6 +17,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"sort"
@@ -70,25 +72,6 @@ const (
 )
 
 const (
-	IndexTemplate = `
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="UTF-8">
-		<title>{{.Title}}</title>
-	</head>
-	<body>
-		<h1>{{.Title}}</h1>
-		<h2>Are you in search of your dream city?</h2>
-		<p>Check out these links:
-			<ul>
-				<li><a href="/by-cost">by cost</a></li>
-				<li><a href="/by-climate">by climate</a></li>
-				<li><a href="/by-population">by population</a></li>
-			</ul>
-		</p>
-	</body>
-</html>`
 	CitiesTemplate = `
 <!DOCTYPE html>
 <html>
@@ -247,8 +230,11 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, PageNotFoundHtml)
 		return
 	}
-
-	t, err := template.New("webpage").Parse(IndexTemplate)
+	htmlo, err := ioutil.ReadFile("index.html")
+	if err != nil {
+		log.Panicf("Oibai, there is a problem reading the file: %v\n", err)
+	}
+	t, err := template.New("webpage").Parse(string(htmlo))
 	if err != nil {
 		log.Panicf("Help, I couldn't parse the %v\n", err)
 	}
