@@ -230,7 +230,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, PageNotFoundHtml)
 		return
 	}
-	htmlo, err := ioutil.ReadFile("index.html")
+	htmlo, err := ioutil.ReadFile("index.html") // TODO: we should read this once on startup, not on every request
 	if err != nil {
 		log.Panicf("Oibai, there is a problem reading the file: %v\n", err)
 	}
@@ -257,7 +257,7 @@ func getCriteriaHandler(c string) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("You are all my minions, %v, beware  %v, %v!\n", r.RemoteAddr, r.Method, r.URL)
 		if r.Method != "GET" {
-			log.Printf("This ain't right: %v!\n", r.Method)
+			log.Printf("This ain't right: %v!\n", r.Method) // TODO: make it html, add a link
 			http.Error(w, "This is a bad request. Try again!", http.StatusBadRequest)
 			return
 		}
