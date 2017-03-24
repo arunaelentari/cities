@@ -202,6 +202,22 @@ func (cs cities) getNames() string {
 }
 
 // sortBy sorts cities by given criteria.
+//
+// TODO: We want a way to sort by a weighted set of criteria, e.g:
+// Cities.sortByCriteria(criteria{"climate", 2}, criteria{"cost", 1})
+// Or:
+// Cities.sortByCriteria(map[string]int{"climate": 2, "cost": 1})
+//
+// Regardless of which function signature we pick, we then want results
+// where the cities are sorted in ascending order (worst to best), like:
+//
+// The sorted cities by climate (67%) and cost (33%) are:
+// * Deviltown: 1234.6M, cost: very expensive, climate: nasty
+// * Copenhagen: 562 379, cost: expensive, climate: poor
+// * Stockholm: 789 024, cost: expensive, climate: poor
+// * New York: 8.4M, cost: expensive, climate: good
+// * Barcelona: 1.6M, cost: reasonable, climate: great
+// * Paradisio: 1.0M, cost: cheap, climate: perfect
 func (cs cities) sortBy(criteria string) {
 	if criteria == "name" {
 		sort.Slice(cs, func(i, j int) bool { return cs[i].name < cs[j].name })
@@ -215,40 +231,6 @@ func (cs cities) sortBy(criteria string) {
 	if criteria == "climate" {
 		sort.Slice(cs, func(i, j int) bool { return cs[i].climate < cs[j].climate })
 	}
-
-}
-
-// getInfo returns information on cities.
-func (cs cities) getInfo() string {
-	// We want a way to sort by a weighted set of criteria, e.g:
-	// Cities.sortByCriteria(criteria{"climate", 2}, criteria{"cost", 1})
-	// Or:
-	// Cities.sortByCriteria(map[string]int{"climate": 2, "cost": 1})
-	//
-	// Regardless of which function signature we pick, we then want results
-	// where the cities are sorted in ascending order (worst to best), like:
-	//
-	// The sorted cities by climate (67%) and cost (33%) are:
-	// * Deviltown: 1234.6M, cost: very expensive, climate: nasty
-	// * Copenhagen: 562 379, cost: expensive, climate: poor
-	// * Stockholm: 789 024, cost: expensive, climate: poor
-	// * New York: 8.4M, cost: expensive, climate: good
-	// * Barcelona: 1.6M, cost: reasonable, climate: great
-	// * Paradisio: 1.0M, cost: cheap, climate: perfect
-
-	n := "The sorted cities by name are:\n"
-	cs.sortBy("name")
-	n += cs.String()
-	n += "\nThe sorted cities by population are:\n"
-	cs.sortBy("population")
-	n += cs.String()
-	n += "\nThe sorted cities by cost are:\n"
-	cs.sortBy("cost")
-	n += cs.String()
-	n += "\nThe sorted cities by climate are:\n"
-	cs.sortBy("climate")
-	n += cs.String()
-	return n
 }
 
 // indexHandler writes the http reply to the request for the index page.
