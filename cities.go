@@ -14,7 +14,6 @@
 package main
 
 import (
-	"crypto/tls"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -22,8 +21,6 @@ import (
 	"net/http"
 	"sort"
 	"strings"
-
-	"golang.org/x/crypto/acme/autocert"
 )
 
 type (
@@ -287,14 +284,14 @@ func getCriteriaHandler(c string) func(http.ResponseWriter, *http.Request) {
 }
 
 func main() {
-	m := autocert.Manager{
-		Prompt:     autocert.AcceptTOS,
-		Cache:      autocert.DirCache("cache"),
-		HostPolicy: autocert.HostWhitelist("cities.hkjn.me"),
-	}
+	//	m := autocert.Manager{
+	//		Prompt:     autocert.AcceptTOS,
+	//		Cache:      autocert.DirCache("cache"),
+	//		HostPolicy: autocert.HostWhitelist("cities.hkjn.me"),
+	//	}
 	s := &http.Server{
-		Addr:      ":https",
-		TLSConfig: &tls.Config{GetCertificate: m.GetCertificate},
+		Addr: ":1025",
+		//		TLSConfig: &tls.Config{GetCertificate: m.GetCertificate},
 	}
 
 	log.Println("Dobroe utro, Larsik!! Where shall we live?")
@@ -304,6 +301,7 @@ func main() {
 	http.HandleFunc("/by-cost", getCriteriaHandler("cost"))
 	http.HandleFunc("/by-population", getCriteriaHandler("population"))
 	http.HandleFunc("/by-climate", getCriteriaHandler("climate"))
-	err := s.ListenAndServeTLS("", "")
+	//	err := s.ListenAndServeTLS("", "")
+	err := s.ListenAndServe()
 	panic(err)
 }
