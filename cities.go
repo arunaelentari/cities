@@ -1,16 +1,16 @@
-// This program is a website that helps you choose a dream city based on various rankings.
-//
-// The home page includes a list of cities.
-//
-// A user can sort cities based on cost, climate, population and other criteria.
-//
-// These are shown on separate pages.
-// - GET /: the index page, gives links to the other pages.
-// - GET /by-cost: ranks cities by cost.
-// - GET /by-climate: ranks cities by climate.
-// - GET /by-population: ranks cities by population.
-// - POST /city: allows users to enter a city
-
+// This program is a website that helps you choose a dream city based on various rankings.                                                                     
+//                                                                                                                                                             
+// The home page includes a list of cities.                                                                                                                    
+//                                                                                                                                                             
+// A user can sort cities based on cost, climate, population and other criteria.                                                                               
+//                                                                                                                                                             
+// These are shown on separate pages:                                                                                                                          
+//                                                                                                                                                             
+//   - GET /: the index page, gives links to the other pages.                                                                                                  
+//   - GET /by-cost: ranks cities by cost.                                                                                                                     
+//   - GET /by-climate: ranks cities by climate.                                                                                                               
+//   - GET /by-population: ranks cities by population.                                                                                                         
+//   - POST /city: allows users to enter a city                                                                                                                
 package main
 
 import (
