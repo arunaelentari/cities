@@ -289,20 +289,15 @@ func getCriteriaHandler(c string) func(http.ResponseWriter, *http.Request) {
 
 func main() {
 	log.Println("Dobroe utro, Larsik!! Where shall we live?")
-	isProdEnv := os.Getenv("CITIES_ISPROD")
-	isProd := false
-	if isProdEnv == "true" {
-		isProd = true
-	}
-	log.Printf("Hello, we got CITIES_ISPROD=%v, so isProd=%v\n", isProdEnv, isProd)
+	prod := os.Getenv("CITIES_ISPROD") == "true"
 	addr := ":1025"
-	if isProd {
+	if prod {
 		addr = ":https"
 	}
 	s := &http.Server{
 		Addr: addr,
 	}
-	if isProd {
+	if prod {
 		m := autocert.Manager{
 			Prompt:     autocert.AcceptTOS,
 			Cache:      autocert.DirCache("cache"),
@@ -316,7 +311,7 @@ func main() {
 	http.HandleFunc("/by-cost", getCriteriaHandler("cost"))
 	http.HandleFunc("/by-population", getCriteriaHandler("population"))
 	http.HandleFunc("/by-climate", getCriteriaHandler("climate"))
-	if isProd {
+	if prod {
 		panic(s.ListenAndServeTLS("", ""))
 	} else {
 		panic(s.ListenAndServe())
