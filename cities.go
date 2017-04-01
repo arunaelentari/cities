@@ -288,7 +288,8 @@ func getCriteriaHandler(c string) func(http.ResponseWriter, *http.Request) {
 }
 
 func main() {
-	log.Println("Dobroe utro, Larsik!! Where shall we live?")
+	version := "1.0.0"
+	log.Printf("Salem, all is good.  I am the version %v\n", version)
 	prod := os.Getenv("CITIES_ISPROD") == "true"
 	addr := ":1025"
 	if prod {
