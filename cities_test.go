@@ -48,7 +48,7 @@ func TestCities_sortBy(t *testing.T) {
 		city{name: "Deviltown", population: 1233567890, cost: VeryExpensiveCost, climate: NastyClimate},
 		city{name: "Paradisio", population: 1e6, cost: CheapCost, climate: PerfectClimate},
 	}
-	// c.sortBy("name")
+	c.sortBy("name")
 	want := cities{
 		city{name: "Barcelona", population: 1.6e6, cost: ReasonableCost, climate: GreatClimate},
 		city{name: "Copenhagen", population: 562379, cost: ExpensiveCost, climate: PoorClimate},
