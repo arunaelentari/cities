@@ -1,6 +1,8 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestAddition(t *testing.T) {
 	got := add(1, 1)
@@ -46,7 +48,7 @@ func TestCities_sortBy(t *testing.T) {
 		city{name: "Deviltown", population: 1233567890, cost: VeryExpensiveCost, climate: NastyClimate},
 		city{name: "Paradisio", population: 1e6, cost: CheapCost, climate: PerfectClimate},
 	}
-	c.sortBy("name")
+	// c.sortBy("name")
 	want := cities{
 		city{name: "Barcelona", population: 1.6e6, cost: ReasonableCost, climate: GreatClimate},
 		city{name: "Copenhagen", population: 562379, cost: ExpensiveCost, climate: PoorClimate},
@@ -57,6 +59,6 @@ func TestCities_sortBy(t *testing.T) {
 		city{name: "Stockholm", population: 789024, cost: ExpensiveCost, climate: PoorClimate},
 	}
 	if !c.Equal(want) {
-		t.Errorf("Not in the same order: %v, want %v\n", c, want)
+		t.Errorf("Not in the same order, cities sortBy(\"name\"):\n%v\nWant\n%v\n", c, want)
 	}
 }

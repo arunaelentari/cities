@@ -1,16 +1,16 @@
-// This program is a website that helps you choose a dream city based on various rankings.                                                                     
-//                                                                                                                                                             
-// The home page includes a list of cities.                                                                                                                    
-//                                                                                                                                                             
-// A user can sort cities based on cost, climate, population and other criteria.                                                                               
-//                                                                                                                                                             
-// These are shown on separate pages:                                                                                                                          
-//                                                                                                                                                             
-//   - GET /: the index page, gives links to the other pages.                                                                                                  
-//   - GET /by-cost: ranks cities by cost.                                                                                                                     
-//   - GET /by-climate: ranks cities by climate.                                                                                                               
-//   - GET /by-population: ranks cities by population.                                                                                                         
-//   - POST /city: allows users to enter a city                                                                                                                
+// This program is a website that helps you choose a dream city based on various rankings.
+//
+// The home page includes a list of cities.
+//
+// A user can sort cities based on cost, climate, population and other criteria.
+//
+// These are shown on separate pages.
+// - GET /: the index page, gives links to the other pages.
+// - GET /by-cost: ranks cities by cost.
+// - GET /by-climate: ranks cities by climate.
+// - GET /by-population: ranks cities by population.
+// - POST /city: allows users to enter a city
+
 package main
 
 import (
@@ -136,6 +136,27 @@ var (
 // TODO: need to check each element.
 func (c1 cities) Equal(c2 cities) bool {
 	if len(c1) != len(c2) {
+		return false
+	}
+	for i := range c1 {
+		if !c1[i].Equal(c2[i]) {
+			return false
+		}
+	}
+	return true
+}
+
+func (c1 city) Equal(c2 city) bool {
+	if c1.name != c2.name {
+		return false
+	}
+	if c1.population != c2.population {
+		return false
+	}
+	if c1.cost != c2.cost {
+		return false
+	}
+	if c1.climate != c2.climate {
 		return false
 	}
 	return true
