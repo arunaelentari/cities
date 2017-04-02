@@ -4,40 +4,6 @@ import (
 	"testing"
 )
 
-func TestAddition(t *testing.T) {
-	got := add(1, 1)
-	want := 2
-	if got != want {
-		t.Errorf("add(%v, %v)=%v, want %v\n", 1, 1, got, want)
-	}
-}
-
-func TestMultiplication(t *testing.T) {
-	type testCase struct {
-		a, b, want int
-	}
-	cases := []testCase{
-		{a: 2, b: 2, want: 4},
-		{a: 3, b: 3, want: 9},
-		{a: 4, b: 4, want: 16},
-		{a: 5, b: 5, want: 25},
-	}
-	for i, tc := range cases {
-		got := multiply(tc.a, tc.b)
-		if got != cases[i].want {
-			t.Errorf("multiply(%v, %v)=%v, want %v\n", tc.a, tc.b, got, tc.want)
-		}
-	}
-}
-
-func multiply(a, b int) int {
-	return a * b
-}
-
-func add(a, b int) int {
-	return a + b
-}
-
 func TestCities_sortBy(t *testing.T) {
 	c := cities{
 		city{name: "Barcelona", population: 1.6e6, cost: ReasonableCost, climate: GreatClimate},
