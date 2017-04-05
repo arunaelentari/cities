@@ -133,7 +133,6 @@ var (
 	}
 )
 
-// TODO: need to check each element.
 func (c1 cities) Equal(c2 cities) bool {
 	if len(c1) != len(c2) {
 		return false

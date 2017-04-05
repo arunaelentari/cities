@@ -4,6 +4,35 @@ import (
 	"testing"
 )
 
+func TestCities_Equal(t *testing.T) {
+	type testCase struct {
+		c1, c2 cities
+		want   bool
+	}
+	cases := []testCase{
+		{
+			c1:   cities{},
+			c2:   cities{},
+			want: true,
+		},
+		{
+			c1: cities{},
+			c2: cities{
+				city{name: "Barcelona", population: 1.6e6, cost: ReasonableCost, climate: GreatClimate},
+			},
+			want: false,
+		},
+	}
+	for _, tc := range cases {
+		//	c1 := cities{}
+		//	c2 := cities{}
+		//		want := true
+		if tc.c1.Equal(tc.c2) != tc.want {
+			t.Errorf("cities.Equal() should be %v for cities\n%q\nand\n%q\n", tc.want, tc.c1, tc.c2)
+		}
+	}
+}
+
 func TestCities_sortBy(t *testing.T) {
 	c := cities{
 		city{name: "Barcelona", population: 1.6e6, cost: ReasonableCost, climate: GreatClimate},
