@@ -75,40 +75,6 @@ const (
 	PerfectClimate
 )
 
-const (
-	CitiesTemplate = `
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="UTF-8">
-		<title>{{.Title}}</title>
-	</head>
-	<body>
-		<h1>{{.Title}}</h1>
-		<h2>Are you in search of your dream city?</h2>
-		<p>The sorted cities by {{.Criteria}} are:
-			<ol>
-				{{range .Cities}}<li>{{ . }}</li>{{end}}
-			</ol>
-		</p>
-		<p>Go back to: <a href="/">home</a></p>
-	</body>
-</html>`
-	PageNotFoundHtml = `
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="UTF-8">
-		<title>Cities</title>
-	</head>
-	<body>
-		<h1>404</h1>
-		<h2>There ain't no page here. Try again!</h2>
-		<p><a href="/">Wanna find an affordable city?</a></p>
-	</body>
-</html>`
-)
-
 var (
 	ClimateDesc = map[climate]string{
 		NastyClimate:   "nasty",
@@ -259,7 +225,11 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		log.Printf("This ain't right: %v!\n", r.URL.Path)
 		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprintf(w, PageNotFoundHtml)
+		htmlo, err := ioutil.ReadFile("404.html")
+		if err != nil {
+			log.Panicf("Oioioi, there is a problem reading the file: %v\n", err)
+		}
+		fmt.Fprintf(w, string(htmlo))
 		return
 	}
 	htmlo, err := ioutil.ReadFile("index.html") // TODO: we should read this once on startup, not on every request
@@ -296,11 +266,18 @@ func getCriteriaHandler(c string) func(http.ResponseWriter, *http.Request) {
 		if r.URL.Path != fmt.Sprintf("/by-%s", c) {
 			log.Printf("This ain't right: %v!\n", r.URL.Path)
 			w.WriteHeader(http.StatusNotFound)
-			fmt.Fprintf(w, PageNotFoundHtml)
+			htmlo, err := ioutil.ReadFile("404.html")
+			if err != nil {
+				log.Panicf("Oioioi, there is a problem reading the file: %v\n", err)
+			}
+			fmt.Fprintf(w, string(htmlo))
 			return
 		}
-
-		t, err := template.New("webpage").Parse(CitiesTemplate)
+		htmlo, err := ioutil.ReadFile("cities.html")
+		if err != nil {
+			log.Panicf("Oivey, there is a problem reading the file: %v\n", err)
+		}
+		t, err := template.New("webpage").Parse(string(htmlo))
 		if err != nil {
 			log.Panicf("Help, I couldn't parse the %v\n", err)
 		}
