@@ -4,6 +4,8 @@ import (
 	"testing"
 )
 
+// TODO: test rendeing html template
+
 func TestCities_Equal(t *testing.T) {
 	type testCase struct {
 		c1, c2 cities
