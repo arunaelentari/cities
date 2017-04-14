@@ -140,7 +140,7 @@ func (c1 cities) Equal(c2 cities) bool {
 	if len(c1) != len(c2) {
 		return false
 	}
-	for i := range c1 { // Q for Lars: what exactly does this do? Compare city names?
+	for i := range c1 {
 		if !c1[i].Equal(c2[i]) {
 			return false
 		}
@@ -165,7 +165,7 @@ func (c1 city) Equal(c2 city) bool {
 }
 
 // String returns a description of the climate.
-func (c climate) String() string { // Q for Lars: in general, if a variable is name in the function's argument, no need to declare it, right?
+func (c climate) String() string {
 	return ClimateDesc[c]
 }
 
