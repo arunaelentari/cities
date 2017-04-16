@@ -54,6 +54,11 @@ type (
 		Criteria string
 		Cities   cities
 	}
+	indexHandler struct {
+	}
+	criteriaHandler struct {
+		criteria string
+	}
 )
 
 const (
@@ -211,8 +216,8 @@ func (cs cities) sortBy(criteria string) {
 	}
 }
 
-// indexHandler writes the http reply to the request for the index page.
-func indexHandler(w http.ResponseWriter, r *http.Request) {
+// ServeHTTP writes the http reply to the request for the index page.
+func (i indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Printf("You are all my minions, %v, beware  %v, %v!\n", r.RemoteAddr, r.Method, r.URL)
 	if r.Method != "GET" {
 		log.Printf("This ain't right: %v!\n", r.Method)
@@ -249,46 +254,43 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// TODO: create by-climate and by-population handlers, add links back to index page, change html
-func getCriteriaHandler(c string) func(http.ResponseWriter, *http.Request) {
-	log.Printf("Yo, I am supposed to get back the handler to criterion %s, maan\n", c)
+// ServeHTTP writes the response for the criteria pages
+func (ch criteriaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Yo, I am supposed to get back the handler to criterion %s, maan\n", ch.criteria)
+	log.Printf("You are all my minions, %v, beware  %v, %v!\n", r.RemoteAddr, r.Method, r.URL)
+	if r.Method != "GET" {
+		log.Printf("This ain't right: %v!\n", r.Method) // TODO: make it html, add a link
+		http.Error(w, "This is a bad request. Try again!", http.StatusBadRequest)
+		return
+	}
+	if r.URL.Path != fmt.Sprintf("/by-%s", ch.criteria) {
+		log.Printf("This ain't right: %v!\n", r.URL.Path)
+		w.WriteHeader(http.StatusNotFound)
+		htmlo, err := ioutil.ReadFile("404.html")
+		if err != nil {
+			log.Panicf("Oioioi, there is a problem reading the file: %v\n", err)
+		}
+		fmt.Fprintf(w, string(htmlo))
+		return
+	}
+	htmlo, err := ioutil.ReadFile("cities.html.tmpl")
+	if err != nil {
+		log.Panicf("Oivey, there is a problem reading the file: %v\n", err)
+	}
+	t, err := template.New("webpage").Parse(string(htmlo))
+	if err != nil {
+		log.Panicf("Help, I couldn't parse the %v\n", err)
+	}
+	Cities.sortBy(ch.criteria)
+	data := pageData{
+		Title:    fmt.Sprintf("By %s", ch.criteria),
+		Criteria: ch.criteria,
+		Cities:   Cities,
+	}
 
-	return func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("You are all my minions, %v, beware  %v, %v!\n", r.RemoteAddr, r.Method, r.URL)
-		if r.Method != "GET" {
-			log.Printf("This ain't right: %v!\n", r.Method) // TODO: make it html, add a link
-			http.Error(w, "This is a bad request. Try again!", http.StatusBadRequest)
-			return
-		}
-		if r.URL.Path != fmt.Sprintf("/by-%s", c) {
-			log.Printf("This ain't right: %v!\n", r.URL.Path)
-			w.WriteHeader(http.StatusNotFound)
-			htmlo, err := ioutil.ReadFile("404.html")
-			if err != nil {
-				log.Panicf("Oioioi, there is a problem reading the file: %v\n", err)
-			}
-			fmt.Fprintf(w, string(htmlo))
-			return
-		}
-		htmlo, err := ioutil.ReadFile("cities.html.tmpl")
-		if err != nil {
-			log.Panicf("Oivey, there is a problem reading the file: %v\n", err)
-		}
-		t, err := template.New("webpage").Parse(string(htmlo))
-		if err != nil {
-			log.Panicf("Help, I couldn't parse the %v\n", err)
-		}
-		Cities.sortBy(c)
-		data := pageData{
-			Title:    fmt.Sprintf("By %s", c),
-			Criteria: c,
-			Cities:   Cities,
-		}
-
-		err = t.Execute(w, data)
-		if err != nil {
-			panic(err)
-		}
+	err = t.Execute(w, data)
+	if err != nil {
+		panic(err)
 	}
 }
 
@@ -313,10 +315,10 @@ func main() {
 	}
 	log.Printf("We have %v cities: %v\n", len(Cities), Cities.getNames())
 	log.Printf("I will now be a webe server forever at %v, you puny minions, hahahaha!\n", addr)
-	http.HandleFunc("/", indexHandler)
-	http.HandleFunc("/by-cost", getCriteriaHandler("cost"))
-	http.HandleFunc("/by-population", getCriteriaHandler("population"))
-	http.HandleFunc("/by-climate", getCriteriaHandler("climate"))
+	http.Handle("/", indexHandler{})
+	http.Handle("/by-cost", criteriaHandler{"cost"})
+	http.Handle("/by-population", criteriaHandler{"population"})
+	http.Handle("/by-climate", criteriaHandler{"climate"})
 	if prod {
 		panic(s.ListenAndServeTLS("", ""))
 	} else {
