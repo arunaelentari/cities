@@ -27,9 +27,6 @@ import (
 	"golang.org/x/crypto/acme/autocert"
 )
 
-// TODO: refactor out html strings into separate files.
-//
-
 type (
 	// cost is the cost of living in a place.
 	cost int
@@ -232,7 +229,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, string(htmlo))
 		return
 	}
-	htmlo, err := ioutil.ReadFile("index.html") // TODO: we should read this once on startup, not on every request
+	htmlo, err := ioutil.ReadFile("index.html.tmpl") // TODO: we should read this once on startup, not on every request
 	if err != nil {
 		log.Panicf("Oibai, there is a problem reading the file: %v\n", err)
 	}
@@ -273,7 +270,7 @@ func getCriteriaHandler(c string) func(http.ResponseWriter, *http.Request) {
 			fmt.Fprintf(w, string(htmlo))
 			return
 		}
-		htmlo, err := ioutil.ReadFile("cities.html")
+		htmlo, err := ioutil.ReadFile("cities.html.tmpl")
 		if err != nil {
 			log.Panicf("Oivey, there is a problem reading the file: %v\n", err)
 		}
