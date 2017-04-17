@@ -295,8 +295,11 @@ func (ch criteriaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	version := "1.0.0"
-	log.Printf("Salem, all is good.  I am the version %v\n", version)
+	version := os.Getenv("CITIES_VERSION")
+	if version == "" {
+		log.Panicf("Oibai, I don't have a CITIES_VERSION\n")
+	}
+	log.Printf("Salem, all is good.  I am the version %q\n", version)
 	prod := os.Getenv("CITIES_ISPROD") == "true"
 	addr := ":1025"
 	if prod {
