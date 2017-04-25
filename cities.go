@@ -262,7 +262,13 @@ func (ch citiesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Printf("You are all my minions, %v, beware  %v, %v!\n", r.RemoteAddr, r.Method, r.URL)
 	if r.Method != "GET" {
 		log.Printf("This ain't right: %v!\n", r.Method) // TODO: make it html, add a link
-		http.Error(w, "This is a bad request. Try again!", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		html, err := ioutil.ReadFile("400.html") // What is the purpose of this?
+		if err != nil {
+			log.Printf("O bozhe, %v", err) // Q for Lars: what kind of message to add?
+		}
+		fmt.Fprintf(w, string(html))
+		//	http.Error(w, "This is a bad request. Try again!", http.StatusBadRequest)
 		return
 	}
 	if r.URL.Path != fmt.Sprintf("/by-%s", ch.criteria) {
