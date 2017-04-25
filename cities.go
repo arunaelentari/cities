@@ -263,8 +263,8 @@ func (ch citiesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		log.Printf("This ain't right: %v!\n", r.Method) // TODO: make it html, add a link
 		w.WriteHeader(http.StatusBadRequest)
-		html, err := ioutil.ReadFile("400.html") // What is the purpose of this?
-		if err != nil {
+		html, err := ioutil.ReadFile("400.html") // Q for Lars: It is not working...
+		if err != nil {                          // Q for Lars: similar to 404. What is the difference?
 			log.Printf("O bozhe, %v", err) // Q for Lars: what kind of message to add?
 		}
 		fmt.Fprintf(w, string(html))
