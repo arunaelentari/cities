@@ -54,9 +54,11 @@ type (
 		Criteria string
 		Cities   cities
 	}
+	// indexHandler handles requests for index page
 	indexHandler struct {
 	}
-	criteriaHandler struct {
+	// citiesHandler serves cities page
+	citiesHandler struct {
 		criteria string
 	}
 )
@@ -255,7 +257,7 @@ func (i indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // ServeHTTP writes the response for the criteria pages
-func (ch criteriaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (ch citiesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Yo, I am supposed to get back the handler to criterion %s, maan\n", ch.criteria)
 	log.Printf("You are all my minions, %v, beware  %v, %v!\n", r.RemoteAddr, r.Method, r.URL)
 	if r.Method != "GET" {
@@ -319,9 +321,9 @@ func main() {
 	log.Printf("We have %v cities: %v\n", len(Cities), Cities.getNames())
 	log.Printf("I will now be a webe server forever at %v, you puny minions, hahahaha!\n", addr)
 	http.Handle("/", indexHandler{})
-	http.Handle("/by-cost", criteriaHandler{"cost"})
-	http.Handle("/by-population", criteriaHandler{"population"})
-	http.Handle("/by-climate", criteriaHandler{"climate"})
+	http.Handle("/by-cost", citiesHandler{"cost"})
+	http.Handle("/by-population", citiesHandler{"population"})
+	http.Handle("/by-climate", citiesHandler{"climate"})
 	if prod {
 		panic(s.ListenAndServeTLS("", ""))
 	} else {
