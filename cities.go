@@ -223,7 +223,12 @@ func (i indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Printf("You are all my minions, %v, beware  %v, %v!\n", r.RemoteAddr, r.Method, r.URL)
 	if r.Method != "GET" {
 		log.Printf("This ain't right: %v!\n", r.Method)
-		http.Error(w, "This is a bad request. Try again!", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		html, err := ioutil.ReadFile("400.html")
+		if err != nil {
+			log.Panicf("O bozhe moi, I failed to read the file %v\n", err)
+		}
+		fmt.Fprintf(w, string(html))
 		return
 	}
 	if r.URL.Path != "/" {
@@ -261,14 +266,13 @@ func (ch citiesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Yo, I am supposed to get back the handler to criterion %s, maan\n", ch.criteria)
 	log.Printf("You are all my minions, %v, beware  %v, %v!\n", r.RemoteAddr, r.Method, r.URL)
 	if r.Method != "GET" {
-		log.Printf("This ain't right: %v!\n", r.Method) // TODO: make it html, add a link
+		log.Printf("This ain't right: %v!\n", r.Method)
 		w.WriteHeader(http.StatusBadRequest)
-		html, err := ioutil.ReadFile("400.html") // Q for Lars: It is not working...
-		if err != nil {                          // Q for Lars: similar to 404. What is the difference?
-			log.Printf("O bozhe, %v", err) // Q for Lars: what kind of message to add?
+		html, err := ioutil.ReadFile("400.html")
+		if err != nil {
+			log.Panicf("O bozhe moi, I failed to read the file %v\n", err)
 		}
 		fmt.Fprintf(w, string(html))
-		//	http.Error(w, "This is a bad request. Try again!", http.StatusBadRequest)
 		return
 	}
 	if r.URL.Path != fmt.Sprintf("/by-%s", ch.criteria) {
