@@ -56,6 +56,7 @@ type (
 	}
 	// indexHandler handles requests for index page
 	indexHandler struct {
+		tmpl *template.Template
 	}
 	// citiesHandler serves cities page
 	citiesHandler struct {
@@ -218,6 +219,21 @@ func (cs cities) sortBy(criteria string) {
 	}
 }
 
+// newIndexHandler return an indexHandler.
+func newIndexHandler() indexHandler {
+	htmlo, err := ioutil.ReadFile("index.html.tmpl")
+	if err != nil {
+		// We might want to make the function return an error instead of
+		// panicking here..
+		log.Panicf("Oibai, there is a problem reading the file: %v\n", err)
+	}
+	tmpl, err := template.New("webpage").Parse(string(htmlo))
+	if err != nil {
+		log.Panicf("Help, I couldn't parse the %v\n", err)
+	}
+	return indexHandler{tmpl: tmpl}
+}
+
 // ServeHTTP writes the http reply to the request for the index page.
 func (i indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Printf("You are all my minions, %v, beware  %v, %v!\n", r.RemoteAddr, r.Method, r.URL)
@@ -241,22 +257,10 @@ func (i indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, string(htmlo))
 		return
 	}
-	htmlo, err := ioutil.ReadFile("index.html.tmpl") // TODO: we should read this once on startup, not on every request
-	if err != nil {
-		log.Panicf("Oibai, there is a problem reading the file: %v\n", err)
-	}
-	t, err := template.New("webpage").Parse(string(htmlo))
-	if err != nil {
-		log.Panicf("Help, I couldn't parse the %v\n", err)
-	}
-	Cities.sortBy("cost")
 	data := pageData{
-		Title:  "Welcome",
-		Cities: Cities,
+		Title: "Welcome",
 	}
-
-	err = t.Execute(w, data)
-	if err != nil {
+	if err := i.tmpl.Execute(w, data); err != nil {
 		panic(err)
 	}
 }
@@ -310,6 +314,7 @@ func main() {
 	version := os.Getenv("CITIES_VERSION")
 	if version == "" {
 		log.Panicf("Oibai, I don't have a CITIES_VERSION\n")
+		//TODO: maybe while not in production we don't need a version
 	}
 	log.Printf("Salem, all is good.  I am the version %q\n", version)
 	prod := os.Getenv("CITIES_ISPROD") == "true"
@@ -330,7 +335,8 @@ func main() {
 	}
 	log.Printf("We have %v cities: %v\n", len(Cities), Cities.getNames())
 	log.Printf("I will now be a webe server forever at %v, you puny minions, hahahaha!\n", addr)
-	http.Handle("/", indexHandler{})
+	// http.Handle("/", indexHandler{})
+	http.Handle("/", newIndexHandler())
 	http.Handle("/by-cost", citiesHandler{"cost"})
 	http.Handle("/by-population", citiesHandler{"population"})
 	http.Handle("/by-climate", citiesHandler{"climate"})
