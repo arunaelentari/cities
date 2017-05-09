@@ -221,6 +221,8 @@ func (cs cities) sortBy(criteria string) {
 
 // newIndexHandler return an indexHandler.
 func newIndexHandler() indexHandler {
+	// TODO: It would be nice to have one compiled binary that included
+	// the .html.tmpl and similar files within it.
 	htmlo, err := ioutil.ReadFile("index.html.tmpl")
 	if err != nil {
 		// We might want to make the function return an error instead of
