@@ -1,2 +1,6 @@
 #!/bin/bash
+#
+# Run the cities server in production mode directly from the
+# repo. See also 'deploy' to run under systemd.
+#
 sudo CITIES_ISPROD=true CITIES_VERSION=$(./last_commit) ./cities

@@ -1,0 +1,21 @@
+#
+# This is a systemd service for cities, which should be copied
+# to /lib/systemd/system/ to run the cities server under systemd.
+#
+# After that, we can use systemctl commands like
+# "systemctl status cities" and "systemctl start cities" to interact
+# with systemd.
+#
+[Unit]
+Description=cities server
+After=network-online.target
+
+[Service]
+WorkingDirectory=/etc/cities
+EnvironmentFile=/etc/cities/cities.env
+ExecStart=/etc/cities/cities
+Restart=always
+
+[Install]
+WantedBy=network-online.target
+
