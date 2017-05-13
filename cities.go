@@ -313,13 +313,16 @@ func (ch citiesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	prod := os.Getenv("CITIES_ISPROD") == "true"
 	version := os.Getenv("CITIES_VERSION")
 	if version == "" {
-		log.Panicf("Oibai, I don't have a CITIES_VERSION\n")
-		//TODO: maybe while not in production we don't need a version
+		if prod {
+			log.Panicf("Oibai, I don't have a CITIES_VERSION\n")
+		} else {
+			version = "dev mode"
+		}
 	}
 	log.Printf("Salem, all is good.  I am the version %q\n", version)
-	prod := os.Getenv("CITIES_ISPROD") == "true"
 	addr := ":1025"
 	if prod {
 		addr = ":https"
