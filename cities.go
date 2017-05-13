@@ -223,7 +223,7 @@ func (cs cities) sortBy(criteria string) {
 func newIndexHandler() indexHandler {
 	// TODO: It would be nice to have one compiled binary that included
 	// the .html.tmpl and similar files within it.
-	htmlo, err := ioutil.ReadFile("index.html.tmpl")
+	htmlo, err := ioutil.ReadFile("html/index.html.tmpl")
 	if err != nil {
 		// We might want to make the function return an error instead of
 		// panicking here..
@@ -242,7 +242,7 @@ func (i indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		log.Printf("This ain't right: %v!\n", r.Method)
 		w.WriteHeader(http.StatusBadRequest)
-		html, err := ioutil.ReadFile("400.html")
+		html, err := ioutil.ReadFile("html/400.html")
 		if err != nil {
 			log.Panicf("O bozhe moi, I failed to read the file %v\n", err)
 		}
@@ -252,7 +252,7 @@ func (i indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		log.Printf("This ain't right: %v!\n", r.URL.Path)
 		w.WriteHeader(http.StatusNotFound)
-		htmlo, err := ioutil.ReadFile("404.html")
+		htmlo, err := ioutil.ReadFile("html/404.html")
 		if err != nil {
 			log.Panicf("Oioioi, there is a problem reading the file: %v\n", err)
 		}
@@ -274,7 +274,7 @@ func (ch citiesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		log.Printf("This ain't right: %v!\n", r.Method)
 		w.WriteHeader(http.StatusBadRequest)
-		html, err := ioutil.ReadFile("400.html")
+		html, err := ioutil.ReadFile("html/400.html")
 		if err != nil {
 			log.Panicf("O bozhe moi, I failed to read the file %v\n", err)
 		}
@@ -284,14 +284,14 @@ func (ch citiesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != fmt.Sprintf("/by-%s", ch.criteria) {
 		log.Printf("This ain't right: %v!\n", r.URL.Path)
 		w.WriteHeader(http.StatusNotFound)
-		htmlo, err := ioutil.ReadFile("404.html")
+		htmlo, err := ioutil.ReadFile("html/404.html")
 		if err != nil {
 			log.Panicf("Oioioi, there is a problem reading the file: %v\n", err)
 		}
 		fmt.Fprintf(w, string(htmlo))
 		return
 	}
-	htmlo, err := ioutil.ReadFile("cities.html.tmpl")
+	htmlo, err := ioutil.ReadFile("html/cities.html.tmpl")
 	if err != nil {
 		log.Panicf("Oivey, there is a problem reading the file: %v\n", err)
 	}

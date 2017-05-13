@@ -4,7 +4,7 @@ set -euo pipefail
 echo "I will compile the cities source coude"
 go build
 
-echo "Yo, I am generating cities.env, man"
+echo "Yo, I am generating cities.env file, man"
 echo "CITIES_ISPROD=true" > cities.env
 echo "CITIES_VERSION=$(./last_commit)" >> cities.env
 
@@ -12,7 +12,7 @@ echo "Stopping ye olde server"
 sudo systemctl stop cities
 
 echo "Whasap, moving files to target directory"
-sudo cp cities cities.env *.html *.html.tmpl /etc/cities/
+sudo cp -r cities cities.env html /etc/cities/
 
 echo "Hurray, restarting the server!"
 sudo systemctl restart cities
