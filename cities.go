@@ -269,8 +269,7 @@ func (i indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // ServeHTTP writes the response for the criteria pages
 func (ch citiesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Printf("Yo, I am supposed to get back the handler to criterion %s, maan\n", ch.criteria)
-	log.Printf("You are all my minions, %v, beware  %v, %v!\n", r.RemoteAddr, r.Method, r.URL)
+	log.Printf("You are all my minions, %q, beware  %v, %v!\n", r.RemoteAddr, r.Method, r.URL)
 	if r.Method != "GET" {
 		log.Printf("This ain't right: %v!\n", r.Method)
 		w.WriteHeader(http.StatusBadRequest)
@@ -340,7 +339,6 @@ func main() {
 	}
 	log.Printf("We have %v cities: %v\n", len(Cities), Cities.getNames())
 	log.Printf("I will now be a webe server forever at %v, you puny minions, hahahaha!\n", addr)
-	// http.Handle("/", indexHandler{})
 	http.Handle("/", newIndexHandler())
 	http.Handle("/by-cost", citiesHandler{"cost"})
 	http.Handle("/by-population", citiesHandler{"population"})

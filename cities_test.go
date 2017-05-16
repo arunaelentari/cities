@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"testing"
 )
 
@@ -20,8 +22,7 @@ func TestCities_Equal(t *testing.T) {
 		{
 			c1: cities{},
 			c2: cities{
-				city{name: "Barcelona", population: 1.6e6, cost: ReasonableCost, climate: GreatClimate},
-			},
+				city{name: "Barcelona", population: 1.6e6, cost: ReasonableCost, climate: GreatClimate}},
 			want: false,
 		},
 	}
@@ -57,5 +58,23 @@ func TestCities_sortBy(t *testing.T) {
 	}
 	if !c.Equal(want) {
 		t.Errorf("Not in the same order, cities sortBy(\"name\"):\n%v\nWant\n%v\n", c, want)
+	}
+}
+
+func TestCitiesHandler(t *testing.T) {
+	req, err := http.NewRequest(
+		http.MethodGet,
+		"http://localhost:1025/by-cost",
+		nil,
+	)
+	if err != nil {
+		t.Fatal("Couldn't create request, man: %v", err)
+	}
+	rec := httptest.NewRecorder()
+	ch := citiesHandler{"cost"}
+	ch.ServeHTTP(rec, req)
+
+	if rec.Code != 200 {
+		t.Errorf("Dude, expected status 200, got %v", rec.Code)
 	}
 }
