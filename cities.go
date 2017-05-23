@@ -56,7 +56,8 @@ type (
 	}
 	// indexHandler handles requests for index page
 	indexHandler struct {
-		tmpl *template.Template
+		tmpl         *template.Template
+		pageNotFound string
 	}
 	// citiesHandler serves cities page
 	citiesHandler struct {
@@ -221,6 +222,10 @@ func (cs cities) sortBy(criteria string) {
 
 // newIndexHandler return an indexHandler.
 func newIndexHandler() indexHandler {
+	pageNotFound, err := ioutil.ReadFile("html/400.html")
+	if err != nil {
+		log.Panicf("O bozhe moi, I failed to read the file %v\n", err)
+	}
 	// TODO: It would be nice to have one compiled binary that included
 	// the .html.tmpl and similar files within it.
 	htmlo, err := ioutil.ReadFile("html/index.html.tmpl")
@@ -233,7 +238,10 @@ func newIndexHandler() indexHandler {
 	if err != nil {
 		log.Panicf("Help, I couldn't parse the %v\n", err)
 	}
-	return indexHandler{tmpl: tmpl}
+	return indexHandler{
+		tmpl:         tmpl,
+		pageNotFound: string(pageNotFound),
+	}
 }
 
 // ServeHTTP writes the http reply to the request for the index page.
@@ -242,11 +250,7 @@ func (i indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		log.Printf("This ain't right: %v!\n", r.Method)
 		w.WriteHeader(http.StatusBadRequest)
-		html, err := ioutil.ReadFile("html/400.html")
-		if err != nil {
-			log.Panicf("O bozhe moi, I failed to read the file %v\n", err)
-		}
-		fmt.Fprintf(w, string(html))
+		fmt.Fprintf(w, i.pageNotFound)
 		return
 	}
 	if r.URL.Path != "/" {
