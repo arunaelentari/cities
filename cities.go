@@ -106,6 +106,7 @@ var (
 		city{name: "Deviltown", population: 1233567890, cost: VeryExpensiveCost, climate: NastyClimate},
 		city{name: "Paradisio", population: 1e6, cost: CheapCost, climate: PerfectClimate},
 	}
+	Prod = os.Getenv("CITIES_ISPROD") == "true"
 )
 
 func (c1 cities) Equal(c2 cities) bool {
@@ -222,13 +223,11 @@ func (cs cities) sortBy(criteria string) {
 
 // newIndexHandler return an indexHandler.
 func newIndexHandler() indexHandler {
-	pageNotFound, err := ioutil.ReadFile("html/400.html")
+	pageNotFound, err := getFile("html/404.html")
 	if err != nil {
 		log.Panicf("O bozhe moi, I failed to read the file %v\n", err)
 	}
-	// TODO: It would be nice to have one compiled binary that included
-	// the .html.tmpl and similar files within it.
-	htmlo, err := ioutil.ReadFile("html/index.html.tmpl")
+	htmlo, err := getFile("html/index.html.tmpl")
 	if err != nil {
 		// We might want to make the function return an error instead of
 		// panicking here..
@@ -250,17 +249,18 @@ func (i indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		log.Printf("This ain't right: %v!\n", r.Method)
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, i.pageNotFound)
+		htmlo, err := getFile("html/404.html")
+		if err != nil {
+			log.Panicf("Oioioi, there is a problem reading the file: %v\n", err)
+		}
+		fmt.Fprintf(w, string(htmlo))
+
 		return
 	}
 	if r.URL.Path != "/" {
 		log.Printf("This ain't right: %v!\n", r.URL.Path)
 		w.WriteHeader(http.StatusNotFound)
-		htmlo, err := ioutil.ReadFile("html/404.html")
-		if err != nil {
-			log.Panicf("Oioioi, there is a problem reading the file: %v\n", err)
-		}
-		fmt.Fprintf(w, string(htmlo))
+		fmt.Fprintf(w, i.pageNotFound)
 		return
 	}
 	data := pageData{
@@ -277,7 +277,7 @@ func (ch citiesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		log.Printf("This ain't right: %v!\n", r.Method)
 		w.WriteHeader(http.StatusBadRequest)
-		html, err := ioutil.ReadFile("html/400.html")
+		html, err := getFile("html/400.html")
 		if err != nil {
 			log.Panicf("O bozhe moi, I failed to read the file %v\n", err)
 		}
@@ -287,14 +287,14 @@ func (ch citiesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != fmt.Sprintf("/by-%s", ch.criteria) {
 		log.Printf("This ain't right: %v!\n", r.URL.Path)
 		w.WriteHeader(http.StatusNotFound)
-		htmlo, err := ioutil.ReadFile("html/404.html")
+		htmlo, err := getFile("html/404.html")
 		if err != nil {
 			log.Panicf("Oioioi, there is a problem reading the file: %v\n", err)
 		}
 		fmt.Fprintf(w, string(htmlo))
 		return
 	}
-	htmlo, err := ioutil.ReadFile("html/cities.html.tmpl")
+	htmlo, err := getFile("html/cities.html.tmpl")
 	if err != nil {
 		log.Panicf("Oivey, there is a problem reading the file: %v\n", err)
 	}
@@ -315,11 +315,21 @@ func (ch citiesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// getFile returns the contents of the specified file.
+//
+// If we are in production, getFile reads the file from bindata assets.
+func getFile(f string) ([]byte, error) {
+	if Prod {
+		return Asset(f)
+	} else {
+		return ioutil.ReadFile(f)
+	}
+}
+
 func main() {
-	prod := os.Getenv("CITIES_ISPROD") == "true"
 	version := os.Getenv("CITIES_VERSION")
 	if version == "" {
-		if prod {
+		if Prod {
 			log.Panicf("Oibai, I don't have a CITIES_VERSION\n")
 		} else {
 			version = "dev mode"
@@ -327,13 +337,13 @@ func main() {
 	}
 	log.Printf("Salem, all is good.  I am the version %q\n", version)
 	addr := ":1025"
-	if prod {
+	if Prod {
 		addr = ":https"
 	}
 	s := &http.Server{
 		Addr: addr,
 	}
-	if prod {
+	if Prod {
 		m := autocert.Manager{
 			Prompt:     autocert.AcceptTOS,
 			Cache:      autocert.DirCache("cache"),
@@ -347,7 +357,7 @@ func main() {
 	http.Handle("/by-cost", citiesHandler{"cost"})
 	http.Handle("/by-population", citiesHandler{"population"})
 	http.Handle("/by-climate", citiesHandler{"climate"})
-	if prod {
+	if Prod {
 		panic(s.ListenAndServeTLS("", ""))
 	} else {
 		panic(s.ListenAndServe())

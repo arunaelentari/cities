@@ -1,6 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
+echo "I will update the bindata"
+go-bindata html/
+
 echo "I will compile the cities source coude"
 go build
 
@@ -16,7 +19,7 @@ echo "Stopping ye olde server"
 sudo systemctl stop cities
 
 echo "Whasap, moving files to target directory"
-sudo cp -r cities cities.env html /etc/cities/
+sudo cp cities cities.env /etc/cities/
 
 echo "Hurray, restarting the server!"
 sudo systemctl restart cities
