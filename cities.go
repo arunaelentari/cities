@@ -221,26 +221,26 @@ func (cs cities) sortBy(criteria string) {
 	}
 }
 
-// newIndexHandler return an indexHandler.
-func newIndexHandler() indexHandler {
+// newIndexHandler return an indexHandler and an error.
+//
+// The error is not nil when there is a problem reading a file or parsing a template.
+func newIndexHandler() (*indexHandler, error) {
 	pageNotFound, err := getFile("html/404.html")
 	if err != nil {
-		log.Panicf("O bozhe moi, I failed to read the file %v\n", err)
+		return nil, fmt.Errorf("O bozhe moi, I failed to read the file %v", err)
 	}
 	htmlo, err := getFile("html/index.html.tmpl")
 	if err != nil {
-		// We might want to make the function return an error instead of
-		// panicking here..
-		log.Panicf("Oibai, there is a problem reading the file: %v\n", err)
+		return nil, fmt.Errorf("Oibai, there is a problem reading the file: %v", err)
 	}
 	tmpl, err := template.New("webpage").Parse(string(htmlo))
 	if err != nil {
-		log.Panicf("Help, I couldn't parse the %v\n", err)
+		return nil, fmt.Errorf("Help, I couldn't parse the %v", err)
 	}
-	return indexHandler{
+	return &indexHandler{
 		tmpl:         tmpl,
 		pageNotFound: string(pageNotFound),
-	}
+	}, nil
 }
 
 // ServeHTTP writes the http reply to the request for the index page.
@@ -249,7 +249,7 @@ func (i indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		log.Printf("This ain't right: %v!\n", r.Method)
 		w.WriteHeader(http.StatusBadRequest)
-		htmlo, err := getFile("html/404.html")
+		htmlo, err := getFile("html/404.html") // TODO: we don't need to read the file here, did it in newIndexHandler
 		if err != nil {
 			log.Panicf("Oioioi, there is a problem reading the file: %v\n", err)
 		}
@@ -353,7 +353,11 @@ func main() {
 	}
 	log.Printf("We have %v cities: %v\n", len(Cities), Cities.getNames())
 	log.Printf("I will now be a webe server forever at %v, you puny minions, hahahaha!\n", addr)
-	http.Handle("/", newIndexHandler())
+	ihandler, err := newIndexHandler()
+	if err != nil {
+		log.Panicf("%v\n", err)
+	}
+	http.Handle("/", ihandler)
 	http.Handle("/by-cost", citiesHandler{"cost"})
 	http.Handle("/by-population", citiesHandler{"population"})
 	http.Handle("/by-climate", citiesHandler{"climate"})
