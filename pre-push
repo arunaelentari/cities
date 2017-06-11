@@ -1,2 +1,3 @@
 #!/bin/bash
-sudo CITIES_ISPROD=true CITIES_VERSION=$(./last_commit) ./cities
+echo "Milady, I will run the tests"
+go test
