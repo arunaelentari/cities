@@ -249,12 +249,7 @@ func (i indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		log.Printf("This ain't right: %v!\n", r.Method)
 		w.WriteHeader(http.StatusBadRequest)
-		htmlo, err := getFile("html/404.html") // TODO: we don't need to read the file here, did it in newIndexHandler
-		if err != nil {
-			log.Panicf("Oioioi, there is a problem reading the file: %v\n", err)
-		}
-		fmt.Fprintf(w, string(htmlo))
-
+		fmt.Fprintf(w, i.pageNotFound)
 		return
 	}
 	if r.URL.Path != "/" {
