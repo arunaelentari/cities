@@ -1,22 +1,14 @@
 #!/bin/bash
 #
-# This script compiles and deploys cities program.
+# This script deploys cities program.
 #
 set -euo pipefail
 
-echo "I will package up html into bindata.go"
-go-bindata html/
-
-echo "I will compile the cities source coude"
-go build
-
-echo "Whasaaap! I will run the test"
-go test
-
-echo "Yo, I am generating cities.env file, man"
-rm -f cities.env
-echo "CITIES_ISPROD=true" >> cities.env
-echo "CITIES_VERSION=$(./last_commit)" >> cities.env
+echo "Bonjour, I will check if cities and cities.env exist"
+if [[ ! -e cities ]] || [[ ! -e cities.env ]]; then
+  echo "Oivey, cities or cities.env does not exist!!"
+  exit 1
+fi
 
 echo "Stopping ye olde server"
 sudo systemctl stop cities
