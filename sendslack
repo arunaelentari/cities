@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+# This script sends messages to slack.
+#
+set -euo pipefail
+
+declare MESSAGE="${1:-}"
+declare SLACKAPIKEY="${SLACKAPIKEY:-}" 
+
+source slack.env
+
+echo "We got $# arguments"
+if [[ "$#" -ne 1 ]]; then
+  echo "Usage is $0 'Yo Mo'"
+  exit 1
+fi
+
+echo "Yo, I will send a message $MESSAGE to slack"
+curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"$MESSAGE\"}" \
+     https://hooks.slack.com/services/$SLACKAPIKEY
+
