@@ -4,6 +4,12 @@
 #
 set -euo pipefail
 
+if ! which go-bindata > /dev/null; then
+  # TODO: ideally log errors to stderr
+  echo "Oivey, we don't have go-bindata! Maybe you're in prod"
+  exit 1
+fi
+
 echo "I will package up html into bindata.go"
 go-bindata html/
 
