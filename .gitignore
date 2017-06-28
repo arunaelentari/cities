@@ -7,3 +7,4 @@
 coverage.out
 cities.env
 bindata.go
+slack.env

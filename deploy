@@ -26,4 +26,6 @@ sudo cp cities cities.env /etc/cities/
 echo "Hurray, restarting the server!"
 sudo systemctl restart cities
 
+source cities.env
 
+./sendslack "Howdy ma'am, I redeployed the cities $CITIES_VERSION service"
