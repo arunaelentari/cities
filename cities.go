@@ -9,7 +9,9 @@
 // - GET /by-cost: ranks cities by cost.
 // - GET /by-climate: ranks cities by climate.
 // - GET /by-population: ranks cities by population.
-// - POST /city: allows users to enter a city
+// - GET /talk: allows a user to fill out a form with a message.
+// - [TODO] POST /city: allows users to enter a city
+// - [TODO] POST /message: send a message to Aruna on slack.
 
 package main
 
@@ -321,6 +323,15 @@ func getFile(f string) ([]byte, error) {
 	}
 }
 
+// talkHandler responds with talk.html page
+func talkHandler(w http.ResponseWriter, r *http.Request) {
+	html, err := getFile("html/talk.html")
+	if err != nil {
+		log.Panicf("Herregud, I failed to read the file %v\n", err)
+	}
+	fmt.Fprintf(w, string(html))
+}
+
 func main() {
 	version := os.Getenv("CITIES_VERSION")
 	if version == "" {
@@ -356,6 +367,7 @@ func main() {
 	http.Handle("/by-cost", citiesHandler{"cost"})
 	http.Handle("/by-population", citiesHandler{"population"})
 	http.Handle("/by-climate", citiesHandler{"climate"})
+	http.HandleFunc("/talk", talkHandler)
 	if Prod {
 		panic(s.ListenAndServeTLS("", ""))
 	} else {
