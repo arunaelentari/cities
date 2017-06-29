@@ -5,8 +5,7 @@
 set -euo pipefail
 
 if ! which go-bindata > /dev/null; then
-  # TODO: ideally log errors to stderr
-  echo "Oivey, we don't have go-bindata! Maybe you're in prod"
+  echo "Oivey, we don't have go-bindata! Maybe you're in prod" >&2
   exit 1
 fi
 

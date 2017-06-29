@@ -6,14 +6,13 @@ set -euo pipefail
 
 echo "Salem, I will verify if we are in production"
 if ! which sudo > /dev/null; then
-  # TODO: ideally log errors to stderr
-  echo "Oibui-oibaiai, we don't have sudo! Maybe you're in dev"
+  echo "Oibui-oibaiai, we don't have sudo! Maybe you're in dev" >&2
   exit 1
 fi
 
 echo "Bonjour, I will check if cities and cities.env exist"
 if [[ ! -e cities ]] || [[ ! -e cities.env ]]; then
-  echo "Oivey, cities or cities.env does not exist!!"
+  echo "Oivey, cities or cities.env does not exist!!" >&2
   exit 1
 fi
 
