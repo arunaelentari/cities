@@ -58,8 +58,9 @@ type (
 	}
 	// indexHandler handles requests for index page
 	indexHandler struct {
-		tmpl         *template.Template
-		pageNotFound string
+		tmpl           *template.Template
+		pageNotFound   string
+		pageBadRequest string
 	}
 	// citiesHandler serves cities page
 	citiesHandler struct {
@@ -231,6 +232,10 @@ func newIndexHandler() (*indexHandler, error) {
 	if err != nil {
 		return nil, fmt.Errorf("O bozhe moi, I failed to read the file %v", err)
 	}
+	pageBadRequest, err := getFile("html/400.html")
+	if err != nil {
+		return nil, fmt.Errorf("O Lordy, I failed to read the file %v", err)
+	}
 	htmlo, err := getFile("html/index.html.tmpl")
 	if err != nil {
 		return nil, fmt.Errorf("Oibai, there is a problem reading the file: %v", err)
@@ -240,24 +245,25 @@ func newIndexHandler() (*indexHandler, error) {
 		return nil, fmt.Errorf("Help, I couldn't parse the %v", err)
 	}
 	return &indexHandler{
-		tmpl:         tmpl,
-		pageNotFound: string(pageNotFound),
+		tmpl:           tmpl,
+		pageNotFound:   string(pageNotFound),
+		pageBadRequest: string(pageBadRequest),
 	}, nil
 }
 
 // ServeHTTP writes the http reply to the request for the index page.
 func (i indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Printf("You are all my minions, %v, beware  %v, %v!\n", r.RemoteAddr, r.Method, r.URL)
-	if r.Method != "GET" {
-		log.Printf("This ain't right: %v!\n", r.Method)
-		w.WriteHeader(http.StatusBadRequest)
+	if r.URL.Path != "/" {
+		log.Printf("Sirree, this is a wrong URL path: %v!\n", r.URL.Path)
+		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprintf(w, i.pageNotFound)
 		return
 	}
-	if r.URL.Path != "/" {
-		log.Printf("This ain't right: %v!\n", r.URL.Path)
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprintf(w, i.pageNotFound)
+	if r.Method != "GET" {
+		log.Printf("Madam, the method thou art using is wrong: %v!\n", r.Method)
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, i.pageBadRequest)
 		return
 	}
 	data := pageData{
@@ -363,7 +369,7 @@ func main() {
 	if err != nil {
 		log.Panicf("%v\n", err)
 	}
-	http.Handle("/", ihandler)
+	http.Handle("/", ihandler) //TODO: create a function for registering handlers
 	http.Handle("/by-cost", citiesHandler{"cost"})
 	http.Handle("/by-population", citiesHandler{"population"})
 	http.Handle("/by-climate", citiesHandler{"climate"})
