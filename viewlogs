@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+# This script allows a user to view the systemd logs of the service.
+#
+set -euo pipefail
+
+echo "Kal kalai, here are the logs"
+sudo journalctl -u cities -f --lines 50
