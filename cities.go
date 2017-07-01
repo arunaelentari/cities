@@ -338,6 +338,20 @@ func talkHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(html))
 }
 
+// regHandlers registers the handlers and returns any errors.
+func regHandlers() error {
+	ihandler, err := newIndexHandler()
+	if err != nil {
+		return err
+	}
+	http.Handle("/", ihandler)
+	http.Handle("/by-cost", citiesHandler{"cost"})
+	http.Handle("/by-population", citiesHandler{"population"})
+	http.Handle("/by-climate", citiesHandler{"climate"})
+	http.HandleFunc("/talk", talkHandler)
+	return nil
+}
+
 func main() {
 	version := os.Getenv("CITIES_VERSION")
 	if version == "" {
@@ -365,15 +379,7 @@ func main() {
 	}
 	log.Printf("We have %v cities: %v\n", len(Cities), Cities.getNames())
 	log.Printf("I will now be a webe server forever at %v, you puny minions, hahahaha!\n", addr)
-	ihandler, err := newIndexHandler()
-	if err != nil {
-		log.Panicf("%v\n", err)
-	}
-	http.Handle("/", ihandler) //TODO: create a function for registering handlers
-	http.Handle("/by-cost", citiesHandler{"cost"})
-	http.Handle("/by-population", citiesHandler{"population"})
-	http.Handle("/by-climate", citiesHandler{"climate"})
-	http.HandleFunc("/talk", talkHandler)
+	regHandlers()
 	if Prod {
 		panic(s.ListenAndServeTLS("", ""))
 	} else {
