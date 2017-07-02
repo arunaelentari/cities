@@ -338,7 +338,7 @@ func talkHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(html))
 }
 
-// regHandlers registers the handlers and returns any errors.
+// regHandlers registers the handlers and returns an error if there is a problem.
 func regHandlers() error {
 	ihandler, err := newIndexHandler()
 	if err != nil {
