@@ -11,7 +11,7 @@
 // - GET /by-population: ranks cities by population.
 // - GET /talk: allows a user to fill out a form with a message.
 // - [TODO] POST /city: allows users to enter a city
-// - [TODO] POST /message: send a message to Aruna on slack.
+// - POST /message: send a message to Aruna on slack.
 
 package main
 
@@ -338,6 +338,14 @@ func talkHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(html))
 }
 
+// messageHandler sends a slack message.
+func messageHandler(w http.ResponseWriter, r *http.Request) {
+	u := r.PostFormValue("username")
+	m := r.PostFormValue("message")
+	log.Printf("Howdy mam, username is: %q, message is: %q\n", u, m)
+	fmt.Fprintf(w, "I am not ready yet, mam\n")
+}
+
 // regHandlers registers the handlers and returns an error if there is a problem.
 func regHandlers() error {
 	ihandler, err := newIndexHandler()
@@ -349,6 +357,7 @@ func regHandlers() error {
 	http.Handle("/by-population", citiesHandler{"population"})
 	http.Handle("/by-climate", citiesHandler{"climate"})
 	http.HandleFunc("/talk", talkHandler)
+	http.HandleFunc("/message", messageHandler)
 	return nil
 }
 
@@ -361,7 +370,7 @@ func main() {
 			version = "dev mode"
 		}
 	}
-	log.Printf("Salem, all is good.  I am the version %q\n", version)
+	log.Printf("Salem, all is good. I am the version %q\n", version)
 	addr := ":1025"
 	if Prod {
 		addr = ":https"
