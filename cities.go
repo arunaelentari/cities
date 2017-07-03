@@ -344,6 +344,8 @@ func messageHandler(w http.ResponseWriter, r *http.Request) {
 	m := r.PostFormValue("message")
 	log.Printf("Howdy mam, username is: %q, message is: %q\n", u, m)
 	fmt.Fprintf(w, "I am not ready yet, mam\n")
+	// TODO: need to check for post, username and message.
+	// TODO: need to send the request to slack.
 }
 
 // regHandlers registers the handlers and returns an error if there is a problem.
