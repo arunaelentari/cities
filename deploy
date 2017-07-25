@@ -9,6 +9,7 @@ if ! which sudo > /dev/null; then
   echo "Oibui-oibaiai, we don't have sudo! Maybe you're in dev" >&2
   exit 1
 fi
+
 # TODO: this needs to be smarter if we are run deploy outside cities dir
 echo "Bonjour, I will check if cities and cities.env exist"
 if [[ ! -e cities ]] || [[ ! -e cities.env ]]; then
