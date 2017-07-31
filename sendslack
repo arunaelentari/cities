@@ -14,8 +14,13 @@ if [[ "$#" -ne 1 ]]; then
   exit 1
 fi
 
-#TODO: the below could fail better, script still succeeds with invalid token.
+# NOTE: if the SLACKAPIKEY is invalid slack returns 302 Found.
+# It would be nice to detect this case and return with failure status.
 echo "Yo, I will send a message '$MESSAGE' to slack"
-curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"$MESSAGE\"}" \
+curl -v \
+     -H 'Content-type: application/json' \
+     --data "{\"text\":\"$MESSAGE\"}" \
      https://hooks.slack.com/services/$SLACKAPIKEY
+echo
+echo "Howdy, I have sent to https://hooks.slack.com/services/$SLACKAPIKEY"
 
