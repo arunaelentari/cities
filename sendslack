@@ -6,20 +6,25 @@ set -euo pipefail
 
 declare MESSAGE="${1:-}"
 declare SLACKAPIKEY="${SLACKAPIKEY:-}" 
+declare RESPONSE=""
 
 source slack.env
 
 if [[ "$#" -ne 1 ]]; then
-  echo "Usage is $0 'Yo Mo'"
+  echo "Usage is $0 'Yo Mo'" >&2
   exit 1
 fi
 
-# NOTE: if the SLACKAPIKEY is invalid slack returns 302 Found.
-# It would be nice to detect this case and return with failure status.
 echo "Yo, I will send a message '$MESSAGE' to slack"
-curl -H 'Content-type: application/json' \
-     --data "{\"text\":\"$MESSAGE\"}" \
-     https://hooks.slack.com/services/$SLACKAPIKEY
+RESPONSE=$(curl -s -H 'Content-type: application/json' \
+                --data "{\"text\":\"$MESSAGE\"}" \
+                https://hooks.slack.com/services/$SLACKAPIKEY)
+
+if [[ "$RESPONSE" != "ok" ]]; then
+  echo "gotty this response '$RESPONSE'"
+  echo "Yo, methinks there is an issue with slack message" >&2
+  exit 1
+fi
 echo
 echo "Howdy, I have sent to https://hooks.slack.com/services/$SLACKAPIKEY"
 
