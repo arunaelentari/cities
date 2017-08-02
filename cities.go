@@ -56,13 +56,13 @@ type (
 		Criteria string
 		Cities   cities
 	}
-	// indexHandler handles requests for index page
+	// indexHandler handles requests for index page.
 	indexHandler struct {
 		tmpl           *template.Template
 		pageNotFound   string
 		pageBadRequest string
 	}
-	// citiesHandler serves cities page
+	// citiesHandler serves cities page.
 	citiesHandler struct {
 		criteria string
 	}
@@ -112,6 +112,7 @@ var (
 	Prod = os.Getenv("CITIES_ISPROD") == "true"
 )
 
+// Equal returns true if the two cities are equivalent.
 func (c1 cities) Equal(c2 cities) bool {
 	if len(c1) != len(c2) {
 		return false
@@ -124,6 +125,7 @@ func (c1 cities) Equal(c2 cities) bool {
 	return true
 }
 
+// Equal returns true if the two city are equivalent.
 func (c1 city) Equal(c2 city) bool {
 	if c1.name != c2.name {
 		return false
