@@ -32,6 +32,7 @@ import (
 type (
 	// cost is the cost of living in a place.
 	cost int
+
 	// climate is the quality of typical weather.
 	climate int
 
@@ -99,6 +100,7 @@ var (
 		ExpensiveCost:      "expensive",
 		VeryExpensiveCost:  "very expensive",
 	}
+
 	// TODO: this should be eventually read from a user.
 	Cities = cities{
 		city{name: "Barcelona", population: 1.6e6, cost: ReasonableCost, climate: GreatClimate},
@@ -109,6 +111,7 @@ var (
 		city{name: "Deviltown", population: 1233567890, cost: VeryExpensiveCost, climate: NastyClimate},
 		city{name: "Paradisio", population: 1e6, cost: CheapCost, climate: PerfectClimate},
 	}
+
 	Prod = os.Getenv("CITIES_ISPROD") == "true"
 )
 
