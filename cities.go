@@ -56,12 +56,14 @@ type (
 		Title    string
 		Criteria string
 		Cities   cities
+		Version  string
 	}
 	// indexHandler handles requests for index page.
 	indexHandler struct {
 		tmpl           *template.Template
 		pageNotFound   string
 		pageBadRequest string
+		version        string
 	}
 	// citiesHandler serves cities page.
 	citiesHandler struct {
@@ -232,7 +234,7 @@ func (cs cities) sortBy(criteria string) {
 // newIndexHandler return an indexHandler and an error.
 //
 // The error is not nil when there is a problem reading a file or parsing a template.
-func newIndexHandler() (*indexHandler, error) {
+func newIndexHandler(version string) (*indexHandler, error) {
 	pageNotFound, err := getFile("html/404.html")
 	if err != nil {
 		return nil, fmt.Errorf("O bozhe moi, I failed to read the file %v", err)
@@ -253,6 +255,7 @@ func newIndexHandler() (*indexHandler, error) {
 		tmpl:           tmpl,
 		pageNotFound:   string(pageNotFound),
 		pageBadRequest: string(pageBadRequest),
+		version:        version,
 	}, nil
 }
 
@@ -272,7 +275,8 @@ func (i indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := pageData{
-		Title: "Welcome",
+		Title:   "Welcome",
+		Version: fmt.Sprintf("This is version %v", i.version),
 	}
 	if err := i.tmpl.Execute(w, data); err != nil {
 		panic(err)
@@ -354,8 +358,8 @@ func messageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // regHandlers registers the handlers and returns an error if there is a problem.
-func regHandlers() error {
-	ihandler, err := newIndexHandler()
+func regHandlers(version string) error {
+	ihandler, err := newIndexHandler(version)
 	if err != nil {
 		return err
 	}
@@ -395,7 +399,7 @@ func main() {
 	}
 	log.Printf("We have %v cities: %v\n", len(Cities), Cities.getNames())
 	log.Printf("I will now be a webe server forever at %v, you puny minions, hahahaha!\n", addr)
-	regHandlers()
+	regHandlers(version)
 	if Prod {
 		panic(s.ListenAndServeTLS("", ""))
 	} else {
