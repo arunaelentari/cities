@@ -11,9 +11,13 @@ to https://build.hkjn.me/hooks/github.com/arunaelentari/cities
 
 To build your program, type `go build`. Next, run as `./cities`.
 
-When you are happy with the changes, run `./build` which packages up the program to be run in prod.
+If you are happy with the changes, commit them and push them to github.
+
+Then, type `./build` which packages up the program to be run in prod.
 
 
 ## production
+
+Once you are done with all the steps in dev mode, you can deploy your program.
 
 To deploy your program, run `./deploy`.
