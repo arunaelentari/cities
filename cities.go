@@ -10,7 +10,7 @@
 // - GET /by-climate: ranks cities by climate.
 // - GET /by-population: ranks cities by population.
 // - GET /talk: allows a user to fill out a form with a message.
-// - [TODO] POST /city: allows users to enter a city
+// - POST /city: allows users to enter a city
 // - POST /message: send a message to Aruna on slack.
 
 package main
@@ -65,7 +65,7 @@ type (
 		pageBadRequest string
 		version        string
 	}
-	// citiesHandler serves cities page.
+	// citiesHandler shows cities ordered in a certain way.
 	citiesHandler struct {
 		criteria string
 	}
@@ -357,6 +357,18 @@ func messageHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: need to send the request to slack.
 }
 
+//addCityHandler allows a user to add a city.
+func addCityHandler(w http.ResponseWriter, r *http.Request) {
+	n := r.PostFormValue("cityname")
+	//	p, err := r.PostFormValue("citypopulation")
+	//	c := r.PostFormValue("citycost")
+	//	cl := r.PostFormValue("cityclimate")
+	newCity := city{name: n, population: 100, cost: ReasonableCost, climate: GreatClimate}
+	Cities = append(Cities, newCity)
+	log.Printf("Howdy mam, new city is: %q", newCity)
+	fmt.Fprintf(w, "I am not ready yet, mam\n")
+}
+
 // regHandlers registers the handlers and returns an error if there is a problem.
 func regHandlers(version string) error {
 	ihandler, err := newIndexHandler(version)
@@ -367,6 +379,7 @@ func regHandlers(version string) error {
 	http.Handle("/by-cost", citiesHandler{"cost"})
 	http.Handle("/by-population", citiesHandler{"population"})
 	http.Handle("/by-climate", citiesHandler{"climate"})
+	http.HandleFunc("/city", addCityHandler)
 	http.HandleFunc("/talk", talkHandler)
 	http.HandleFunc("/message", messageHandler)
 	return nil
