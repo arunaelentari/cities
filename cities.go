@@ -367,7 +367,7 @@ func addCityHandler(w http.ResponseWriter, r *http.Request) {
 	//	p, err := r.PostFormValue("citypopulation")
 	//	c := r.PostFormValue("citycost")
 	//	cl := r.PostFormValue("cityclimate")
-	newCity := city{name: n, population: 100, cost: ReasonableCost, climate: GreatClimate}
+	newCity := city{name: n, population: 1000, cost: ReasonableCost, climate: GreatClimate}
 	Cities = append(Cities, newCity)
 	log.Printf("Howdy mam, new city is: %q", newCity)
 	fmt.Fprintf(w, "I am not ready yet, mam\n")
