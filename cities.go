@@ -364,13 +364,20 @@ func messageHandler(w http.ResponseWriter, r *http.Request) {
 // TODO: need to be able to modify a city or delete it.
 func addCityHandler(w http.ResponseWriter, r *http.Request) {
 	n := r.PostFormValue("cityname")
+	if n == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Println("Bozhechki, no city was entered!\n")
+		fmt.Fprintf(w, "Madam or Siree, you have not entered the city name!\n")
+		return
+	}
 	//	p, err := r.PostFormValue("citypopulation")
 	//	c := r.PostFormValue("citycost")
 	//	cl := r.PostFormValue("cityclimate")
 	newCity := city{name: n, population: 1000, cost: ReasonableCost, climate: GreatClimate}
 	Cities = append(Cities, newCity)
 	log.Printf("Howdy mam, new city is: %q", newCity)
-	fmt.Fprintf(w, "I am not ready yet, mam\n")
+	http.Redirect(w, r,  "/", http.StatusFound)
+//	fmt.Fprintf(w,"Your city has been entered, madam or siree: %v\n", n)
 }
 
 // regHandlers registers the handlers and returns an error if there is a problem.
