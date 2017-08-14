@@ -260,6 +260,7 @@ func newIndexHandler(version string) (*indexHandler, error) {
 }
 
 // ServeHTTP writes the http reply to the request for the index page.
+// TODO: add support for showing a message if /?message=howdymam.
 func (i indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Printf("You are all my minions, %v, beware  %v, %v!\n", r.RemoteAddr, r.Method, r.URL)
 	if r.URL.Path != "/" {
@@ -359,7 +360,7 @@ func messageHandler(w http.ResponseWriter, r *http.Request) {
 
 //addCityHandler allows a user to add a city.
 
-// TODO: when a user enters the city, redirect to index page and acknolwedge that the city was entered.
+// TODO: when a user enters a city, acknowledge that the city was entered.
 // TODO: if a city was entered twice, inform the user that the city already exists. Don't save it again.
 // TODO: need to be able to modify a city or delete it.
 func addCityHandler(w http.ResponseWriter, r *http.Request) {
@@ -370,14 +371,16 @@ func addCityHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Madam or Siree, you have not entered the city name!\n")
 		return
 	}
+	// else {
+	//	fmt.Printf(w, "Here is your city: %v\n", )
 	//	p, err := r.PostFormValue("citypopulation")
 	//	c := r.PostFormValue("citycost")
 	//	cl := r.PostFormValue("cityclimate")
 	newCity := city{name: n, population: 1000, cost: ReasonableCost, climate: GreatClimate}
 	Cities = append(Cities, newCity)
 	log.Printf("Howdy mam, new city is: %q", newCity)
-	http.Redirect(w, r,  "/", http.StatusFound)
-//	fmt.Fprintf(w,"Your city has been entered, madam or siree: %v\n", n)
+	http.Redirect(w, r, "/", http.StatusFound)
+	//	fmt.Fprintf(w,"Your city has been entered, madam or siree: %v\n", n)
 }
 
 // regHandlers registers the handlers and returns an error if there is a problem.
